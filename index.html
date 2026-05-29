@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consultoria Financeira | Vitor Davanzo CFP®</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Georgia&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <img src="logo.png" alt="Vitor Davanzo" class="sidebar-logo">
+      <div class="sidebar-tagline">CFP® · Planejador Financeiro</div>
+    </div>
+    <div class="sidebar-gold-line"></div>
+    <nav>
+      <div class="nav-section">Consultoria</div>
+      <div class="nav-item active" data-page="page-dados"><i class="ti ti-user-circle"></i> Dados do Cliente</div>
+      <div class="nav-item" data-page="page-dividas"><i class="ti ti-credit-card"></i> Dívidas</div>
+      <div class="nav-item" data-page="page-diagnostico"><i class="ti ti-chart-bar"></i> Diagnóstico</div>
+      <div class="nav-item" data-page="page-estrategia"><i class="ti ti-target"></i> Estratégia</div>
+      <div class="nav-item" data-page="page-relatorio"><i class="ti ti-file-text"></i> Relatório</div>
+    </nav>
+    <div class="sidebar-footer">ESTRATÉGIA · PATRIMÔNIO · FUTURO</div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main">
+    <header class="topbar">
+      <div>
+        <div class="topbar-title" id="topbar-title">Dados do Cliente</div>
+        <div class="topbar-sub" id="topbar-sub">Passo 1 de 5 — Identificação e renda</div>
+      </div>
+      <div class="topbar-actions">
+        <button class="btn-outline" onclick="limparTudo()"><i class="ti ti-refresh"></i> Novo cliente</button>
+        <button class="btn-gold" onclick="proximoPasso()"><i class="ti ti-arrow-right"></i> Avançar</button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <!-- STEPS BAR -->
+      <div class="steps-bar">
+        <div class="step-pill active" data-step="0">1 — Dados<span>Identificação</span></div>
+        <div class="step-pill" data-step="1">2 — Dívidas<span>Mapeamento</span></div>
+        <div class="step-pill" data-step="2">3 — Diagnóstico<span>Análise</span></div>
+        <div class="step-pill" data-step="3">4 — Estratégia<span>Plano</span></div>
+        <div class="step-pill" data-step="4">5 — Relatório<span>Exportar</span></div>
+      </div>
+
+      <!-- PÁGINA 1: DADOS -->
+      <section class="page active" id="page-dados">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-user"></i> Identificação</div>
+          <div class="form-grid">
+            <div class="field"><label>Nome completo</label><input id="cli-nome" type="text" placeholder="Nome do cliente"></div>
+            <div class="field"><label>Cidade / Estado</label><input id="cli-cidade" type="text" placeholder="Ex: Piracicaba – SP"></div>
+            <div class="field"><label>Profissão</label><input id="cli-profissao" type="text" placeholder="Ex: Autônomo, CLT..."></div>
+            <div class="field"><label>Estado civil</label>
+              <select id="cli-estado-civil">
+                <option value="">Selecione</option>
+                <option>Solteiro(a)</option><option>Casado(a)</option>
+                <option>Divorciado(a)</option><option>Viúvo(a)</option>
+              </select>
+            </div>
+            <div class="field"><label>Dependentes</label><input id="cli-dependentes" type="number" placeholder="0" min="0"></div>
+            <div class="field"><label>Data da consultoria</label><input id="cli-data" type="date"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-coins"></i> Fontes de Renda</div>
+          <div id="rendas-list"></div>
+          <button class="btn-add" onclick="adicionarRenda()"><i class="ti ti-plus"></i> Adicionar fonte de renda</button>
+        </div>
+        <div class="card">
+          <div class="card-title"><i class="ti ti-home"></i> Despesas Fixas Mensais</div>
+          <div id="despesas-list"></div>
+          <button class="btn-add" onclick="adicionarDesp()"><i class="ti ti-plus"></i> Adicionar despesa</button>
+        </div>
+      </section>
+
+      <!-- PÁGINA 2: DÍVIDAS -->
+      <section class="page" id="page-dividas">
+        <div class="card">
+          <div class="card-title"><i class="ti ti-credit-card"></i> Raio-X das Dívidas</div>
+          <div class="divida-header">
+            <span>Credor / Tipo</span><span>Saldo (R$)</span><span>Juros % a.m.</span><span>Parcela (R$)</span><span></span>
+          </div>
+          <div id="dividas-list"></div>
+          <button class="btn-add" onclick="adicionarDivida()"><i class="ti ti-plus"></i> Adicionar dívida</button>
+        </div>
+      </section>
+
+      <!-- PÁGINA 3: DIAGNÓSTICO -->
+      <section class="page" id="page-diagnostico">
+        <div id="diagnostico-content"></div>
+      </section>
+
+      <!-- PÁGINA 4: ESTRATÉGIA -->
+      <section class="page" id="page-estrategia">
+        <div id="estrategia-content"></div>
+      </section>
+
+      <!-- PÁGINA 5: RELATÓRIO -->
+      <section class="page" id="page-relatorio">
+        <div id="relatorio-content"></div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div id="loading-overlay">
+  <div class="loading-box">
+    <i class="ti ti-loader-2 spin"></i>
+    <p id="loading-msg">Calculando...</p>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
