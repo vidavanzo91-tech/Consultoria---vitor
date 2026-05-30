@@ -2,13 +2,13 @@
 // CONSULTORIA FINANCEIRA — VITOR DAVANZO CFP®
 // app.js — Lógica completa do sistema
 // ═══════════════════════════════════════════════
- 
+
 const PAGES = ['page-dados','page-dividas','page-diagnostico','page-estrategia','page-relatorio'];
 const TITLES = ['Dados do Cliente','Mapeamento de Dívidas','Diagnóstico Financeiro','Estratégia Recomendada','Relatório Final'];
 const SUBS   = ['Passo 1 de 5 — Identificação e renda','Passo 2 de 5 — Raio-X das dívidas','Passo 3 de 5 — Análise automática','Passo 4 de 5 — Seleção do plano','Passo 5 de 5 — Exportação do relatório'];
- 
+
 let estrategiaSelecionada = 'avalanche';
- 
+
 // ── FORMATAÇÃO MONETÁRIA NOS INPUTS ───────────
 // Armazena o valor numérico puro em data-raw e exibe formatado
 function formatarInputMonetario(input) {
@@ -21,14 +21,14 @@ function formatarInputMonetario(input) {
   // Formata no padrão brasileiro
   input.value = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
- 
+
 function getValorInput(input) {
   if (input.dataset.raw) return parseFloat(input.dataset.raw) || 0;
   // fallback: tenta parsear o valor exibido
   const v = input.value.replace(/\./g, '').replace(',', '.');
   return parseFloat(v) || 0;
 }
- 
+
 function ativarFormatacao(input) {
   input.addEventListener('input', () => formatarInputMonetario(input));
   input.addEventListener('blur',  () => formatarInputMonetario(input));
@@ -39,7 +39,7 @@ function ativarFormatacao(input) {
     input.value = num.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 }
- 
+
 // ── NAVEGAÇÃO ─────────────────────────────────
 function goPage(id) {
   PAGES.forEach((p, i) => {
@@ -63,26 +63,26 @@ function goPage(id) {
   if (id === 'page-relatorio')   gerarRelatorio();
   window.scrollTo(0, 0);
 }
- 
+
 function proximoPasso() {
   const active = PAGES.find(p => document.getElementById(p)?.classList.contains('active'));
   const idx = PAGES.indexOf(active);
   if (idx < PAGES.length - 1) goPage(PAGES[idx + 1]);
 }
- 
+
 document.querySelectorAll('.nav-item').forEach(el => {
   el.addEventListener('click', () => goPage(el.dataset.page));
 });
 document.querySelectorAll('.step-pill').forEach(el => {
   el.addEventListener('click', () => goPage(PAGES[+el.dataset.step]));
 });
- 
+
 // ── HELPERS FINANCEIROS ────────────────────────
 function fmt(v) {
   return Number(v).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 function pct(v) { return Number(v).toFixed(1) + '%'; }
- 
+
 function urgenciaColor(juros) {
   if (juros >= 10) return 'var(--red)';
   if (juros >= 5)  return 'var(--orange)';
@@ -98,19 +98,19 @@ function semClass(juros) {
   if (juros >= 5)  return 'sem-yellow';
   return 'sem-green';
 }
- 
+
 // ── COLETA DE DADOS ───────────────────────────
 function getDados() {
   const rendas = [...document.querySelectorAll('.renda-row')].map(r => ({
     desc: r.querySelector('.renda-desc')?.value || '',
     val:  getValorInput(r.querySelector('.renda-val')),
   })).filter(r => r.val > 0);
- 
+
   const despesas = [...document.querySelectorAll('.desp-row')].map(r => ({
     desc: r.querySelector('.desp-desc')?.value || '',
     val:  getValorInput(r.querySelector('.desp-val')),
   })).filter(d => d.val > 0);
- 
+
   const dividas = [...document.querySelectorAll('.divida-row')].map(r => ({
     credor:        r.querySelector('.div-credor')?.value  || '—',
     saldo:         getValorInput(r.querySelector('.div-saldo')),
@@ -119,17 +119,17 @@ function getDados() {
     totalParcelas: parseInt(r.querySelector('.div-total-parcelas')?.value) || 0,
     pagasParcelas: parseInt(r.querySelector('.div-pagas')?.value) || 0,
   })).filter(d => d.saldo > 0);
- 
+
   const totalRenda      = rendas.reduce((a, r) => a + r.val, 0);
   const totalDespesas   = despesas.reduce((a, d) => a + d.val, 0);
   const totalParcelas   = dividas.reduce((a, d) => a + d.parcela, 0);
   const totalDividas    = dividas.reduce((a, d) => a + d.saldo, 0);
   const comprometimento = totalRenda > 0 ? (totalParcelas / totalRenda * 100) : 0;
   const saldoLivre      = totalRenda - totalDespesas - totalParcelas;
- 
+
   return { rendas, despesas, dividas, totalRenda, totalDespesas, totalParcelas, totalDividas, comprometimento, saldoLivre };
 }
- 
+
 function custaInerciaTotal(dividas) {
   return dividas.reduce((acc, d) => {
     const meses = 24, r = d.juros / 100;
@@ -139,7 +139,7 @@ function custaInerciaTotal(dividas) {
     return acc + Math.max(0, total - d.saldo);
   }, 0);
 }
- 
+
 // ── SIMULAÇÕES ────────────────────────────────
 function simular(dividas, saldoLivre, ordem) {
   if (!dividas.length || saldoLivre <= 0) return { meses: 0, jurosTotal: 0 };
@@ -161,7 +161,7 @@ function simular(dividas, saldoLivre, ordem) {
   }
   return { meses: mes, jurosTotal: Math.round(jurosTotal) };
 }
- 
+
 // ── CRIAR INPUT MONETÁRIO ─────────────────────
 function criarInputMonetario(placeholder, className, extraStyle = '') {
   const input = document.createElement('input');
@@ -173,117 +173,121 @@ function criarInputMonetario(placeholder, className, extraStyle = '') {
   ativarFormatacao(input);
   return input;
 }
- 
+
 // ── ADICIONAR / REMOVER LINHAS ─────────────────
 function adicionarRenda() {
   const el = document.getElementById('rendas-list');
   const row = document.createElement('div');
   row.className = 'renda-row';
- 
+
   const descWrap = document.createElement('div'); descWrap.className = 'field';
   const descInput = document.createElement('input');
   descInput.type = 'text'; descInput.placeholder = 'Ex: Salário CLT'; descInput.className = 'renda-desc';
   descWrap.appendChild(descInput);
- 
+
   const valWrap = document.createElement('div'); valWrap.className = 'field';
   const valInput = criarInputMonetario('R$ 0,00', 'renda-val');
   valWrap.appendChild(valInput);
- 
+
   const btn = document.createElement('button');
   btn.className = 'btn-remove'; btn.innerHTML = '<i class="ti ti-x"></i>';
   btn.onclick = () => row.remove();
- 
+
   row.appendChild(descWrap); row.appendChild(valWrap); row.appendChild(btn);
   el.appendChild(row);
 }
- 
+
 // ── DESPESAS PADRÃO ───────────────────────────
 const DESPESAS_PADRAO = [
   'Aluguel', 'Condomínio', 'Água', 'Luz', 'Gás',
   'Telefone', 'Internet', 'Plano de saúde', 'Mercado', 'Escola / Faculdade'
 ];
- 
+
 function adicionarDesp(descricao = '') {
   const el = document.getElementById('despesas-list');
   const row = document.createElement('div');
   row.className = 'desp-row renda-row';
- 
+
   const descWrap = document.createElement('div'); descWrap.className = 'field';
   const descInput = document.createElement('input');
   descInput.type = 'text'; descInput.placeholder = 'Descrição'; descInput.className = 'desp-desc';
   if (descricao) descInput.value = descricao;
   descWrap.appendChild(descInput);
- 
+
   const valWrap = document.createElement('div'); valWrap.className = 'field';
   const valInput = criarInputMonetario('R$ 0,00', 'desp-val');
   valWrap.appendChild(valInput);
- 
+
   const btn = document.createElement('button');
   btn.className = 'btn-remove'; btn.innerHTML = '<i class="ti ti-x"></i>';
   btn.onclick = () => row.remove();
- 
+
   row.appendChild(descWrap); row.appendChild(valWrap); row.appendChild(btn);
   el.appendChild(row);
 }
- 
+
 function inicializarDespesasPadrao() {
   DESPESAS_PADRAO.forEach(desc => adicionarDesp(desc));
 }
- 
+
 function adicionarDivida() {
   const el = document.getElementById('dividas-list');
   const row = document.createElement('div');
   row.className = 'divida-row';
- 
+
   const credorWrap = document.createElement('div'); credorWrap.className = 'field';
   const credorInput = document.createElement('input');
   credorInput.type = 'text'; credorInput.placeholder = 'Ex: Cartão Nubank'; credorInput.className = 'div-credor';
   credorWrap.appendChild(credorInput);
- 
+
   const saldoWrap = document.createElement('div'); saldoWrap.className = 'field';
   const saldoInput = criarInputMonetario('R$ 0,00', 'div-saldo');
   saldoWrap.appendChild(saldoInput);
- 
+
   const jurosWrap = document.createElement('div'); jurosWrap.className = 'field';
   const jurosInput = document.createElement('input');
   jurosInput.type = 'number'; jurosInput.placeholder = '0,0'; jurosInput.step = '0.1'; jurosInput.min = '0';
   jurosInput.className = 'div-juros';
   jurosWrap.appendChild(jurosInput);
- 
+
   const parcelaWrap = document.createElement('div'); parcelaWrap.className = 'field';
   const parcelaInput = criarInputMonetario('R$ 0,00', 'div-parcela');
   parcelaWrap.appendChild(parcelaInput);
- 
+
   const totalParcelasWrap = document.createElement('div'); totalParcelasWrap.className = 'field';
+  const totalParcelasLabel = document.createElement('label'); totalParcelasLabel.textContent = 'Qtd. parcelas';
   const totalParcelasInput = document.createElement('input');
   totalParcelasInput.type = 'number'; totalParcelasInput.placeholder = '0'; totalParcelasInput.min = '0';
   totalParcelasInput.className = 'div-total-parcelas';
+  totalParcelasWrap.appendChild(totalParcelasLabel);
   totalParcelasWrap.appendChild(totalParcelasInput);
- 
+
   const pagasWrap = document.createElement('div'); pagasWrap.className = 'field';
+  const pagasLabel = document.createElement('label'); pagasLabel.textContent = 'Pagas';
   const pagasInput = document.createElement('input');
   pagasInput.type = 'number'; pagasInput.placeholder = '0'; pagasInput.min = '0';
   pagasInput.className = 'div-pagas';
+  pagasWrap.appendChild(pagasLabel);
   pagasWrap.appendChild(pagasInput);
- 
+
   const btn = document.createElement('button');
   btn.className = 'btn-remove'; btn.innerHTML = '<i class="ti ti-x"></i>';
   btn.onclick = () => row.remove();
- 
+
   row.appendChild(credorWrap); row.appendChild(saldoWrap);
   row.appendChild(jurosWrap);  row.appendChild(parcelaWrap);
   row.appendChild(totalParcelasWrap); row.appendChild(pagasWrap);
   row.appendChild(btn);
   el.appendChild(row);
 }
- 
- 
+
+
 // ── PÁGINA 3: DIAGNÓSTICO ─────────────────────
 function gerarDiagnostico() {
   const d = getDados();
   const inertia = custaInerciaTotal(d.dividas);
   const saldo   = d.saldoLivre;
- 
+
   let alertHTML = '';
   if (d.comprometimento > 50) {
     alertHTML = `<div class="alert-box alert-danger"><i class="ti ti-alert-triangle"></i><div><strong>Comprometimento crítico:</strong> ${pct(d.comprometimento)} da renda está comprometida com dívidas. Intervenção urgente necessária.</div></div>`;
@@ -292,7 +296,7 @@ function gerarDiagnostico() {
   } else if (d.comprometimento > 0) {
     alertHTML = `<div class="alert-box alert-ok"><i class="ti ti-circle-check"></i><div>Comprometimento dentro do limite aceitável. A estratégia de quitação pode ser aplicada com tranquilidade.</div></div>`;
   }
- 
+
   const dividasOrdenadas = [...d.dividas].sort((a,b) => b.juros - a.juros);
   const listaHTML = dividasOrdenadas.map(div => `
     <div class="div-item">
@@ -304,7 +308,7 @@ function gerarDiagnostico() {
         <span style="font-size:10px;font-weight:700;color:${urgenciaColor(div.juros)}">${urgenciaLabel(div.juros)}</span>
       </div>
     </div>`).join('');
- 
+
   document.getElementById('diagnostico-content').innerHTML = `
     ${alertHTML}
     <div class="diagnostico-grid">
@@ -337,7 +341,7 @@ function gerarDiagnostico() {
       </div>
     </div>`;
 }
- 
+
 // ── PÁGINA 4: ESTRATÉGIA ──────────────────────
 function gerarEstrategia() {
   const d  = getDados();
@@ -345,7 +349,7 @@ function gerarEstrategia() {
   const av = simular(d.dividas, sl, 'avalanche');
   const bn = simular(d.dividas, sl, 'bolaneve');
   const hi = { meses: Math.round((av.meses + bn.meses) / 2), jurosTotal: Math.round((av.jurosTotal + bn.jurosTotal) / 2) };
- 
+
   let recomendada = 'avalanche';
   let justificativa = 'Alta concentração de dívidas com juros elevados. O método Avalanche elimina primeiro as dívidas de maior custo, reduzindo o total de juros pagos.';
   if (bn.meses <= av.meses * 0.85) {
@@ -356,13 +360,13 @@ function gerarEstrategia() {
     justificativa = 'Comprometimento de renda elevado. A estratégia Híbrida equilibra ganho de motivação com economia de juros, adequada para este perfil.';
   }
   estrategiaSelecionada = recomendada;
- 
+
   const cardsData = [
     { id: 'avalanche', nome: 'Avalanche',    desc: 'Ataca o maior juro primeiro. Economiza mais no longo prazo.', sim: av, dif: 'Alta' },
     { id: 'bolaneve',  nome: 'Bola de Neve', desc: 'Menor saldo primeiro. Gera motivação com vitórias rápidas.',  sim: bn, dif: 'Média' },
     { id: 'hibrido',   nome: 'Híbrida',      desc: 'Equilíbrio entre economia de juros e motivação comportamental.', sim: hi, dif: 'Média' },
   ];
- 
+
   const cardsHTML = cardsData.map(c => `
     <div class="est-card ${c.id === recomendada ? 'recommended selected' : ''}" id="est-${c.id}" onclick="selecionarEst('${c.id}')">
       ${c.id === recomendada ? '<div class="est-badge">✦ RECOMENDADA</div>' : ''}
@@ -372,7 +376,7 @@ function gerarEstrategia() {
       <div class="est-metric"><span class="est-metric-label">Juros totais</span><span class="est-metric-val txt-red">${fmt(c.sim.jurosTotal)}</span></div>
       <div class="est-metric"><span class="est-metric-label">Dificuldade</span><span class="est-metric-val">${c.dif}</span></div>
     </div>`).join('');
- 
+
   const dividasPriorizadas = [...d.dividas].sort((a,b) => recomendada === 'bolaneve' ? a.saldo - b.saldo : b.juros - a.juros);
   const ordemHTML = dividasPriorizadas.map((div, i) => `
     <div class="ordem-item">
@@ -382,7 +386,7 @@ function gerarEstrategia() {
       <div style="font-weight:600;color:var(--red);min-width:100px;text-align:right;">${fmt(div.saldo)}</div>
       ${i === 0 ? '<div style="color:var(--green);font-weight:600;font-size:11px;margin-left:8px;">← ATACAR AGORA</div>' : ''}
     </div>`).join('');
- 
+
   document.getElementById('estrategia-content').innerHTML = `
     <div class="card">
       <div class="tag-gold">Motor de Estratégia</div>
@@ -404,14 +408,14 @@ function gerarEstrategia() {
       ${d.saldoLivre <= 0 ? '<div class="alert-box alert-danger" style="margin-top:12px;"><i class="ti ti-alert-triangle"></i><div>Sem saldo livre. É necessário reduzir despesas ou aumentar renda antes de aplicar qualquer estratégia.</div></div>' : ''}
     </div>`;
 }
- 
+
 function selecionarEst(id) {
   estrategiaSelecionada = id;
   ['avalanche','bolaneve','hibrido'].forEach(e => {
     document.getElementById('est-' + e)?.classList.toggle('selected', e === id);
   });
 }
- 
+
 // ── PÁGINA 5: RELATÓRIO ───────────────────────
 function gerarRelatorio() {
   const nome    = document.getElementById('cli-nome').value    || 'Cliente';
@@ -420,15 +424,15 @@ function gerarRelatorio() {
   const ec      = document.getElementById('cli-estado-civil').value || '';
   const dataRaw = document.getElementById('cli-data').value;
   const dataFmt = dataRaw ? new Date(dataRaw + 'T12:00:00').toLocaleDateString('pt-BR') : new Date().toLocaleDateString('pt-BR');
- 
+
   const d       = getDados();
   const inertia = custaInerciaTotal(d.dividas);
   const sl      = Math.max(0, d.saldoLivre);
   const simAtual = simular(d.dividas, sl, estrategiaSelecionada === 'bolaneve' ? 'bolaneve' : 'avalanche');
   const nomeEst  = { avalanche: 'Avalanche', bolaneve: 'Bola de Neve', hibrido: 'Híbrida' }[estrategiaSelecionada];
- 
+
   const dividasPriorizadas = [...d.dividas].sort((a,b) => estrategiaSelecionada === 'bolaneve' ? a.saldo - b.saldo : b.juros - a.juros);
- 
+
   const tabelaDividas = d.dividas.map((div) => `
     <tr>
       <td>${div.credor}</td>
@@ -437,7 +441,7 @@ function gerarRelatorio() {
       <td style="text-align:right;">${fmt(div.parcela)}</td>
       <td style="text-align:center;font-size:10px;font-weight:700;color:${urgenciaColor(div.juros)};">${urgenciaLabel(div.juros)}</td>
     </tr>`).join('');
- 
+
   const ordemAtaque = dividasPriorizadas.map((div, i) => `
     <div class="rel-acao-item">
       <div class="rel-acao-num">${i+1}.</div>
@@ -446,7 +450,7 @@ function gerarRelatorio() {
         <div class="rel-acao-prazo">${pct(div.juros)} a.m. · ${i===0?'ATACAR AGORA':'Aguardar quitação anterior'}</div>
       </div>
     </div>`).join('');
- 
+
   document.getElementById('relatorio-content').innerHTML = `
     <div style="display:flex;justify-content:flex-end;gap:10px;margin-bottom:16px;">
       <button class="btn-outline" onclick="window.print()"><i class="ti ti-printer"></i> Imprimir / PDF</button>
@@ -511,7 +515,7 @@ function gerarRelatorio() {
       </div>
     </div>`;
 }
- 
+
 function limparTudo() {
   if (!confirm('Limpar todos os dados e iniciar nova consultoria?')) return;
   document.querySelectorAll('input').forEach(i => { i.value = ''; i.dataset.raw = '0'; });
@@ -524,10 +528,9 @@ function limparTudo() {
   document.getElementById('cli-data').value = new Date().toISOString().split('T')[0];
   goPage('page-dados');
 }
- 
+
 // ── INICIALIZAÇÃO ─────────────────────────────
 document.getElementById('cli-data').value = new Date().toISOString().split('T')[0];
 adicionarRenda();
 inicializarDespesasPadrao();
 adicionarDivida();
- 
