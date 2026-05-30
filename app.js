@@ -298,11 +298,6 @@ function adicionarDivida() {
 
 
 // ── PÁGINA 3: DIAGNÓSTICO ─────────────────────
-function executarDiagnostico() {
-  document.getElementById('diagnostico-trigger').style.display = 'none';
-  gerarDiagnostico();
-}
-
 function gerarDiagnostico() {
   const d = getDados();
   const inertia = custaInerciaTotal(d.dividas);
