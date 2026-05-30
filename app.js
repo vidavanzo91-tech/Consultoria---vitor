@@ -23,9 +23,10 @@ function formatarInputMonetario(input) {
 }
 
 function getValorInput(input) {
-  if (input.dataset.raw) return parseFloat(input.dataset.raw) || 0;
+  if (!input) return 0;
+  if (input.dataset && input.dataset.raw) return parseFloat(input.dataset.raw) || 0;
   // fallback: tenta parsear o valor exibido
-  const v = input.value.replace(/\./g, '').replace(',', '.');
+  const v = (input.value || '').replace(/\./g, '').replace(',', '.');
   return parseFloat(v) || 0;
 }
 
@@ -100,17 +101,20 @@ function semClass(juros) {
 
 // ── COLETA DE DADOS ───────────────────────────
 function getDados() {
-  const rendas = [...document.querySelectorAll('.renda-row')].map(r => ({
+  // Rendas: apenas linhas do #rendas-list (evita pegar .desp-row que também tem .renda-row)
+  const rendas = [...document.querySelectorAll('#rendas-list .renda-row')].map(r => ({
     desc: r.querySelector('.renda-desc')?.value || '',
     val:  getValorInput(r.querySelector('.renda-val')),
   })).filter(r => r.val > 0);
 
-  const despesas = [...document.querySelectorAll('.desp-row')].map(r => ({
+  // Despesas: apenas linhas do #despesas-list
+  const despesas = [...document.querySelectorAll('#despesas-list .desp-row')].map(r => ({
     desc: r.querySelector('.desp-desc')?.value || '',
     val:  getValorInput(r.querySelector('.desp-val')),
   })).filter(d => d.val > 0);
 
-  const dividas = [...document.querySelectorAll('.divida-row')].map(r => ({
+  // Dívidas: apenas linhas do #dividas-list
+  const dividas = [...document.querySelectorAll('#dividas-list .divida-row')].map(r => ({
     credor:        r.querySelector('.div-credor')?.value  || '—',
     saldo:         getValorInput(r.querySelector('.div-saldo')),
     juros:         parseFloat(r.querySelector('.div-juros')?.value?.replace(',','.')) || 0,
