@@ -191,6 +191,7 @@ function adicionarRenda() {
 
   const btn = document.createElement('button');
   btn.className = 'btn-remove'; btn.innerHTML = '<i class="ti ti-x"></i>';
+  btn.setAttribute('tabindex', '-1');
   btn.onclick = () => row.remove();
 
   row.appendChild(descWrap); row.appendChild(valWrap); row.appendChild(btn);
@@ -220,7 +221,17 @@ function adicionarDesp(descricao = '') {
 
   const btn = document.createElement('button');
   btn.className = 'btn-remove'; btn.innerHTML = '<i class="ti ti-x"></i>';
+  btn.setAttribute('tabindex', '-1');
   btn.onclick = () => row.remove();
+
+  // TAB inteligente: se descrição já preenchida, pula direto para valor
+  descInput.addEventListener('keydown', e => {
+    if (e.key === 'Tab' && !e.shiftKey && descInput.value.trim()) {
+      e.preventDefault();
+      valInput.focus();
+      valInput.select();
+    }
+  });
 
   row.appendChild(descWrap); row.appendChild(valWrap); row.appendChild(btn);
   el.appendChild(row);
@@ -272,6 +283,7 @@ function adicionarDivida() {
 
   const btn = document.createElement('button');
   btn.className = 'btn-remove'; btn.innerHTML = '<i class="ti ti-x"></i>';
+  btn.setAttribute('tabindex', '-1');
   btn.onclick = () => row.remove();
 
   row.appendChild(credorWrap); row.appendChild(saldoWrap);
