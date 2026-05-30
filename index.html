@@ -98,13 +98,16 @@
 
       <!-- PÁGINA 3: DIAGNÓSTICO -->
       <section class="page" id="page-diagnostico">
-        <div id="diagnostico-trigger" style="text-align:center; padding: 60px 0;">
-          <div style="font-size:13px; color:#aaa; margin-bottom:20px;">Clique no botão abaixo para gerar o diagnóstico com os dados preenchidos.</div>
-          <button class="btn-gold" style="font-size:14px; padding:14px 36px;" onclick="executarDiagnostico()">
-            <i class="ti ti-chart-bar"></i>&nbsp; Efetuar Diagnóstico
+        <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+          <button class="btn-gold" onclick="gerarDiagnostico()">
+            <i class="ti ti-refresh"></i>&nbsp; Atualizar Diagnóstico
           </button>
         </div>
-        <div id="diagnostico-content"></div>
+        <div id="diagnostico-content">
+          <div style="text-align:center; padding:60px 0; color:#bbb; font-size:13px;">
+            Clique em "Atualizar Diagnóstico" para gerar a análise.
+          </div>
+        </div>
       </section>
 
       <!-- PÁGINA 4: ESTRATÉGIA -->
