@@ -58,7 +58,6 @@ function goPage(id) {
   const idx = PAGES.indexOf(id);
   document.getElementById('topbar-title').textContent = TITLES[idx];
   document.getElementById('topbar-sub').textContent   = SUBS[idx];
-  if (id === 'page-diagnostico') gerarDiagnostico();
   if (id === 'page-estrategia')  gerarEstrategia();
   if (id === 'page-relatorio')   gerarRelatorio();
   window.scrollTo(0, 0);
@@ -295,6 +294,11 @@ function adicionarDivida() {
 
 
 // ── PÁGINA 3: DIAGNÓSTICO ─────────────────────
+function executarDiagnostico() {
+  document.getElementById('diagnostico-trigger').style.display = 'none';
+  gerarDiagnostico();
+}
+
 function gerarDiagnostico() {
   const d = getDados();
   const inertia = custaInerciaTotal(d.dividas);
