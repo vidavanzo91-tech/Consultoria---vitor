@@ -139,12 +139,12 @@ html, body { height: 100%; font-family: 'Poppins', sans-serif; background: var(-
 
 /* ── DÍVIDAS ── */
 .divida-header {
-  display: grid; grid-template-columns: 2.5fr 1.5fr 1fr 1.2fr 0.4fr;
+  display: grid; grid-template-columns: 2fr 1.2fr 0.8fr 1.1fr 0.8fr 0.8fr 0.3fr;
   gap: 8px; margin-bottom: 6px; padding: 0 2px;
 }
 .divida-header span { font-size: 10px; font-weight: 600; color: #bbb; letter-spacing: 0.05em; text-transform: uppercase; }
 .divida-row {
-  display: grid; grid-template-columns: 2.5fr 1.5fr 1fr 1.2fr 0.4fr;
+  display: grid; grid-template-columns: 2fr 1.2fr 0.8fr 1.1fr 0.8fr 0.8fr 0.3fr;
   gap: 8px; align-items: end; padding: 8px 0;
   border-bottom: 1px solid var(--cream2);
 }
